@@ -277,11 +277,11 @@ p:last-child { margin-bottom: 0; }
 
 /* ---------- About / skills ---------- */
 .about-grid {
-  display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: 56px;
-  align-items: start;
+  display: block;
+  max-width: 68ch;
 }
+
+.about-grid p { font-size: 1.02rem; }
 
 .skill-group { margin-bottom: 24px; }
 .skill-group:last-child { margin-bottom: 0; }
@@ -310,6 +310,98 @@ p:last-child { margin-bottom: 0; }
   border-radius: 20px;
   color: var(--ink);
   background: var(--paper-raised);
+}
+
+/* ---------- Skill bubbles ---------- */
+.bubble-field {
+  position: relative;
+  height: 480px;
+  margin-top: 32px;
+}
+
+.bubble {
+  position: absolute;
+  width: 152px;
+  height: 152px;
+  border-radius: 50%;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 18px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  box-shadow: 0 1px 3px rgba(20, 23, 28, 0.06);
+  animation: bubble-float 7s ease-in-out infinite;
+  transition: width 0.32s cubic-bezier(.2,.8,.2,1), height 0.32s cubic-bezier(.2,.8,.2,1),
+              border-radius 0.32s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  z-index: 1;
+}
+
+.bubble:hover {
+  border-color: var(--teal);
+  box-shadow: 0 6px 18px rgba(20, 23, 28, 0.1);
+}
+
+.bubble:active { cursor: grabbing; }
+
+.bubble.dragging {
+  animation-play-state: paused;
+  z-index: 40;
+  box-shadow: 0 10px 24px rgba(20, 23, 28, 0.14);
+}
+
+.bubble-title {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.bubble-content {
+  display: none;
+  margin-top: 12px;
+}
+
+.bubble-content .chip-row { justify-content: flex-start; }
+
+.bubble.expanded {
+  width: 300px;
+  height: 300px;
+  border-radius: 24px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 26px;
+  cursor: default;
+  animation-play-state: paused;
+  border-color: var(--teal);
+  box-shadow: 0 14px 32px rgba(20, 23, 28, 0.14);
+  z-index: 50;
+}
+
+.bubble.expanded .bubble-title { font-size: 0.9rem; }
+.bubble.expanded .bubble-content { display: block; }
+
+@keyframes bubble-float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(-14px) translateX(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble { animation: none; }
+}
+
+@media (max-width: 780px) {
+  .bubble-field { height: 620px; }
+  .bubble { width: 118px; height: 118px; padding: 12px; }
+  .bubble-title { font-size: 0.74rem; }
+  .bubble.expanded { width: 250px; height: 280px; }
 }
 
 /* ---------- Project cards ---------- */
@@ -450,6 +542,22 @@ p:last-child { margin-bottom: 0; }
 }
 .cert-item h4 { font-size: 1rem; margin-bottom: 4px; }
 .cert-item .pub-meta { margin-bottom: 0; }
+
+.cert-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.cert-link {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink);
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 2px;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.cert-link:hover { color: var(--teal); border-color: var(--teal); }
 
 /* ---------- Education ---------- */
 .edu-item {
