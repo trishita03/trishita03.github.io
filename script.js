@@ -48,3 +48,81 @@ if (sections.length && navLinks.length && 'IntersectionObserver' in window) {
   );
   sections.forEach((section) => spy.observe(section));
 }
+
+// Skill bubbles: drag to move, click to expand
+const bubbleField = document.getElementById('bubbleField');
+if (bubbleField) {
+  const bubbles = bubbleField.querySelectorAll('.bubble');
+
+  const collapseAll = (except) => {
+    bubbles.forEach((b) => {
+      if (b !== except) b.classList.remove('expanded');
+    });
+  };
+
+  const toggleExpand = (el) => {
+    const wasExpanded = el.classList.contains('expanded');
+    collapseAll(null);
+    if (!wasExpanded) el.classList.add('expanded');
+  };
+
+  bubbles.forEach((el) => {
+    let dragging = false;
+    let moved = false;
+    let startX = 0, startY = 0, origLeft = 0, origTop = 0;
+
+    const onPointerDown = (e) => {
+      dragging = true;
+      moved = false;
+      el.setPointerCapture(e.pointerId);
+      const rect = el.getBoundingClientRect();
+      const fieldRect = bubbleField.getBoundingClientRect();
+      origLeft = rect.left - fieldRect.left;
+      origTop = rect.top - fieldRect.top;
+      startX = e.clientX;
+      startY = e.clientY;
+      el.style.left = origLeft + 'px';
+      el.style.top = origTop + 'px';
+      el.classList.add('dragging');
+    };
+
+    const onPointerMove = (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+      const maxLeft = bubbleField.clientWidth - el.offsetWidth;
+      const maxTop = bubbleField.clientHeight - el.offsetHeight;
+      const newLeft = Math.max(0, Math.min(maxLeft, origLeft + dx));
+      const newTop = Math.max(0, Math.min(maxTop, origTop + dy));
+      el.style.left = newLeft + 'px';
+      el.style.top = newTop + 'px';
+    };
+
+    const onPointerUp = (e) => {
+      if (!dragging) return;
+      dragging = false;
+      el.classList.remove('dragging');
+      try { el.releasePointerCapture(e.pointerId); } catch (err) {}
+      if (!moved) toggleExpand(el);
+    };
+
+    el.addEventListener('pointerdown', onPointerDown);
+    el.addEventListener('pointermove', onPointerMove);
+    el.addEventListener('pointerup', onPointerUp);
+    el.addEventListener('pointercancel', onPointerUp);
+
+    // keyboard accessibility: Enter/Space toggles expand
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleExpand(el);
+      }
+    });
+  });
+
+  // click outside collapses any expanded bubble
+  document.addEventListener('pointerdown', (e) => {
+    if (!bubbleField.contains(e.target)) collapseAll(null);
+  });
+}
